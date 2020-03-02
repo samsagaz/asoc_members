@@ -532,9 +532,10 @@ class MemberDetailView(LoginRequiredMixin, DetailView):
         context = super(MemberDetailView, self).get_context_data(**kwargs)
         member = self.get_object()
         today = datetime.date.today()
-        debt = logic.get_debt_state(member, today.year, today.month)
-        if len(debt) > 1 and member.category.fee > 0:
-            context['debtor'] = True
+        if member.first_payment_month:
+            debt = logic.get_debt_state(member, today.year, today.month)
+            if len(debt) > 1 and member.category.fee > 0:
+                context['debtor'] = True
         context['member'] = member
         context['quotas'] = Quota.objects.filter(member=member)[:6]
         context['missing_letter'] = not member.has_subscription_letter
